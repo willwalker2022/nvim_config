@@ -1,30 +1,43 @@
 return {
   {
-    "rcarriga/nvim-dap-ui",
-    lazy = true,
+    "igorlfs/nvim-dap-view",
     dependencies = {
-      "mfussenegger/nvim-dap",
-      "nvim-neotest/nvim-nio",
+      {
+        -- Solve the display issue with lualine
+        "nvim-lualine/lualine.nvim",
+        optional = true,
+        opts = { options = { disabled_filetypes = { winbar = { "dap-view", "dap-view-term", "dap-repl" } } } },
+      },
     },
-    main = "dapui",
     -- stylua: ignore
     keys = {
-      { "<leader>Du", function() require("dapui").toggle({reset = true}) end, desc = "[DAP ui] Toggle dapui" },
+      { "<leader>Du", function() require("dap-view").toggle() end, desc = "[DAP view] Toggle dap-view" },
     },
-    opts = {},
-
-    config = function(_, opts)
-      local dapui = require("dapui")
-      dapui.setup(opts)
-
-      local dap = require("dap")
-      dap.listeners.before.attach.dapui_config = function()
-        dapui.open()
-      end
-      dap.listeners.before.launch.dapui_config = function()
-        dapui.open()
-      end
-    end,
+    ---@module 'dap-view'
+    ---@type dapview.Config
+    opts = {
+      winbar = {
+        sections = { "scopes", "repl", "watches", "breakpoints", "exceptions" },
+        default_section = "scopes",
+        controls = {
+          enabled = true,
+        },
+      },
+      windows = {
+        height = 0.25,
+        position = "below",
+        terminal = {
+          width = 0.1,
+          position = "right",
+          -- List of debug adapters for which the terminal should be ALWAYS hidden
+          hide = {},
+        },
+      },
+      help = {
+        border = "rounded",
+      },
+      auto_toggle = true,
+    },
   },
 
   {
@@ -39,12 +52,7 @@ return {
   {
     "mfussenegger/nvim-dap",
     dependencies = {
-      {
-        -- Solve the display issue with lualine
-        "nvim-lualine/lualine.nvim",
-        optional = true,
-        opts = { options = { disabled_filetypes = { winbar = { "dap-repl" } } } },
-      },
+      "igorlfs/nvim-dap-view",
     },
     -- stylua: ignore
     keys = {
@@ -66,7 +74,7 @@ return {
       { "<Leader>Ds", function() local widgets = require("dap.ui.widgets") widgets.centered_float(widgets.scopes) end, mode = {"n"},        desc = "[DAP] Float scopes" },
     },
 
-    config = function()
+    opts = function()
       --stylua: ignore
       local dap_breakpoint = {
         breakpoint = { text = "", texthl = "DapBreakpoint", linehl = "DapBreakpoint", numhl = "DapBreakpoint" }, -- Nerd font: nf-cod-activate_breakpoints
@@ -80,6 +88,13 @@ return {
       vim.fn.sign_define("DapBreakpointRejected", dap_breakpoint.rejected)
       vim.fn.sign_define("DapLogPoint", dap_breakpoint.logpoint)
       vim.fn.sign_define("DapStopped", dap_breakpoint.stopped)
+    end,
+
+    config = function()
+      local dap = require("dap")
+      dap.defaults.fallback.external_terminal = {
+        command = "kitty",
+      }
     end,
   },
 }

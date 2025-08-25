@@ -35,6 +35,8 @@ return {
         which_key = true,
         flash = true,
         lsp_trouble = true,
+        dap = true,
+        dap_ui = true,
       },
     },
     config = function(_, opts)

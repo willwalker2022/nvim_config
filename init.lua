@@ -21,6 +21,9 @@ vim.o.signcolumn = "yes:1"
 
 vim.wo.wrap = false
 
+-- Enables project-local `.nvim.lua` configuration file
+vim.o.exrc = true
+
 -- Tab related options
 vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
