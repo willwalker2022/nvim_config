@@ -13,6 +13,18 @@ return {
   },
 
   {
+    "j-hui/fidget.nvim",
+    opts = {
+      notification = {
+        window = {
+          winblend = 0,
+          border = "rounded",
+        },
+      },
+    },
+  },
+
+  {
     "nvim-lualine/lualine.nvim",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
@@ -171,7 +183,9 @@ return {
         enabled = false,
       },
       lsp = {
-
+        progress = {
+          enabled = false, -- lsp progress is handled by fidget.nvim
+        },
         -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = false,
