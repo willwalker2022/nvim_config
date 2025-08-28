@@ -42,6 +42,7 @@ local M = {
   {
     "linux-cultist/venv-selector.nvim",
     branch = "regexp", -- Use this branch for the new version
+    dependencies = { "mfussenegger/nvim-dap" },
     cmd = "VenvSelect",
     opts = {
       settings = {
