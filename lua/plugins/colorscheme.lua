@@ -5,6 +5,10 @@ return {
     priority = 1000,
     opts = {
       transparent_background = true,
+      float = {
+        transparent = true, -- enable transparent floating windows
+      },
+
       custom_highlights = function(colors)
         -- stylua: ignore
         return {
