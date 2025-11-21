@@ -41,6 +41,8 @@ vim.g.maplocalleader = "\\"
 
 vim.opt.shell = "fish"
 
+vim.o.winborder = "rounded"
+
 require("config.lazy") -- Import `./lua/config/lazy.lua`
 
 require("keymapping")
