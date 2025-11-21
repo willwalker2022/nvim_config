@@ -1,4 +1,4 @@
-vim.lsp.enable("pyright")
+vim.lsp.enable("basedpyright")
 
 local M = {
   {
@@ -14,7 +14,7 @@ local M = {
     "mason-org/mason.nvim",
     optional = true,
     opts_extend = { "ensure_installed" },
-    opts = { ensure_installed = { "ruff", "pyright" } },
+    opts = { ensure_installed = { "ruff", "pyright", "basedpyright" } },
   },
 
   -- formatter
