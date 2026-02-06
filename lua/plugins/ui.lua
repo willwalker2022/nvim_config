@@ -2,13 +2,7 @@ return {
   {
     "nvim-tree/nvim-web-devicons",
     opts = {
-      override = {
-        copilot = {
-          icon = "",
-          color = "#cba6f7", -- Catppuccin.mocha.mauve
-          name = "Copilot",
-        },
-      },
+      override = {},
     },
   },
 
@@ -28,7 +22,6 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
-      "AndreM222/copilot-lualine",
     },
     opts = {
       options = {
@@ -49,7 +42,7 @@ return {
       winbar = {
         lualine_a = { "filename", },
         lualine_b = { { function() return " " end, color = "Comment", }, },
-        lualine_x = { "lsp_status", },
+        lualine_x = {},
       },
       inactive_winbar = {
         -- Always show winbar
@@ -59,6 +52,31 @@ return {
     },
     config = function(_, opts)
       local mocha = require("catppuccin.palettes").get_palette("mocha")
+
+      local function lsp_status()
+        if not vim.lsp then
+          return ""
+        end
+        local clients
+        if vim.lsp.get_clients then
+          clients = vim.lsp.get_clients({ bufnr = 0 })
+        else
+          clients = vim.lsp.get_active_clients({ bufnr = 0 })
+        end
+        if not clients or #clients == 0 then
+          return ""
+        end
+        local names = {}
+        for _, client in ipairs(clients) do
+          if client.name and client.name ~= "" then
+            table.insert(names, client.name)
+          end
+        end
+        if #names == 0 then
+          return ""
+        end
+        return " " .. table.concat(names, ",")
+      end
 
       local function show_macro_recording()
         local recording_register = vim.fn.reg_recording()
@@ -76,25 +94,8 @@ return {
         padding = 0,
       }
 
-      local copilot = {
-        "copilot",
-        show_colors = true,
-        symbols = {
-          status = {
-            hl = {
-              enabled = mocha.green,
-              sleep = mocha.overlay0,
-              disabled = mocha.surface0,
-              warning = mocha.peach,
-              unknown = mocha.red,
-            },
-          },
-          spinner_color = mocha.mauve,
-        },
-      }
-
       table.insert(opts.sections.lualine_x, 1, macro_recording)
-      table.insert(opts.sections.lualine_c, copilot)
+      opts.winbar.lualine_x = { lsp_status }
 
       require("lualine").setup(opts)
     end,
@@ -150,6 +151,15 @@ return {
       { "<leader>e", "<CMD>NvimTreeToggle<CR>", mode = { "n" }, desc = "[NvimTree] Toggle NvimTree" },
     },
     opts = {},
+    config = function(_, opts)
+      local Explorer = require("nvim-tree.explorer")
+      function Explorer:destroy()
+        -- Guard against already-deleted augroups in some versions.
+        pcall(vim.api.nvim_del_augroup_by_id, self.augroup_id)
+        Explorer.super.destroy(self)
+      end
+      require("nvim-tree").setup(opts)
+    end,
   },
 
   {
@@ -223,7 +233,6 @@ return {
       },
       -- stylua: ignore
       spec = {
-        { "<leader>cc", group = "<CodeCompanion>", icon = "" },
         { "<leader>s",  group = "<Snacks>"                    },
         { "<leader>t",  group = "<Snacks> Toggle"             },
       },
@@ -361,7 +370,7 @@ return {
   {
     "petertriho/nvim-scrollbar",
     opts = {
-      handelers = {
+      handlers = {
         gitsigns = true, -- Requires gitsigns
         search = true, -- Requires hlslens
       },

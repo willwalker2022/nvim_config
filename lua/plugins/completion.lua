@@ -6,7 +6,6 @@ return {
       -- 'rafamadriz/friendly-snippets'
       "nvim-tree/nvim-web-devicons",
       "onsails/lspkind.nvim",
-      "fang2hou/blink-copilot",
       "folke/lazydev.nvim",
     },
 
@@ -70,11 +69,10 @@ return {
           if success and node and vim.tbl_contains({ "comment", "line_comment", "block_comment" }, node:type()) then
             return { "buffer" }
           else
-            return { "lazydev", "copilot", "lsp", "path", "snippets", "buffer" }
+            return { "lazydev", "lsp", "path", "snippets", "buffer" }
           end
         end,
         per_filetype = {
-          codecompanion = { "codecompanion" },
         },
 
         providers = {
@@ -83,16 +81,6 @@ return {
             module = "lazydev.integrations.blink",
             -- make lazydev completions top priority (see `:h blink.cmp`)
             score_offset = 95,
-          },
-          copilot = {
-            name = "copilot",
-            module = "blink-copilot",
-            score_offset = 100,
-            async = true,
-            opts = {
-              kind_icon = "",
-              kind_hl = "DevIconCopilot",
-            },
           },
           path = {
             score_offset = 95,

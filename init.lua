@@ -10,6 +10,7 @@ vim.opt.listchars = { tab = ">-", trail = "-" }
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
+vim.opt.clipboard = "unnamedplus"
 
 vim.opt.scrolloff = 5
 vim.opt.sidescrolloff = 10
@@ -39,9 +40,11 @@ vim.opt.splitright = true
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
-vim.opt.shell = "fish"
+vim.opt.shell = "zsh"
 
-vim.o.winborder = "rounded"
+if vim.fn.exists("&winborder") == 1 then
+  vim.o.winborder = "rounded"
+end
 
 require("config.lazy") -- Import `./lua/config/lazy.lua`
 
