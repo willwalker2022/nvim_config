@@ -62,4 +62,15 @@ return {
     },
     opts_extend = { "ensure_installed" },
   },
+
+  {
+    "stevearc/conform.nvim",
+    optional = true,
+    opts = {
+      formatters_by_ft = {
+        c = { "clang-format" },
+        cpp = { "clang-format" },
+      },
+    },
+  },
 }
