@@ -92,10 +92,20 @@ return {
 
     config = function()
       local dap = require("dap")
-      if vim.fn.executable("kitty") == 1 then
-        dap.defaults.fallback.external_terminal = {
-          command = "kitty",
-        }
+      local terminal_candidates = {
+        { command = "kitty", args = {} },
+        { command = "wezterm", args = { "start", "--always-new-process" } },
+        { command = "alacritty", args = { "-e" } },
+        { command = "gnome-terminal", args = { "--" } },
+        { command = "x-terminal-emulator", args = { "-e" } },
+        { command = "xterm", args = { "-e" } },
+      }
+
+      for _, terminal in ipairs(terminal_candidates) do
+        if vim.fn.executable(terminal.command) == 1 then
+          dap.defaults.fallback.external_terminal = terminal
+          break
+        end
       end
     end,
   },

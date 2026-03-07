@@ -30,6 +30,13 @@ return {
 
     -- example calling setup directly for each LSP
     config = function()
+      local ok, blink = pcall(require, "blink.cmp")
+      if ok and vim.lsp and vim.lsp.config then
+        vim.lsp.config("*", {
+          capabilities = blink.get_lsp_capabilities(),
+        })
+      end
+
       vim.diagnostic.config({
         underline = false,
         signs = false,

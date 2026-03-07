@@ -10,7 +10,24 @@ vim.opt.listchars = { tab = ">-", trail = "-" }
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
-vim.opt.clipboard = "unnamedplus"
+local function executable(cmd)
+  return type(cmd) == "string" and cmd ~= "" and vim.fn.executable(cmd) == 1
+end
+
+local has_clipboard_provider = false
+if vim.fn.has("mac") == 1 then
+  has_clipboard_provider = executable("pbcopy") and executable("pbpaste")
+elseif vim.fn.has("win32") == 1 then
+  has_clipboard_provider = true
+else
+  local has_wayland = executable("wl-copy") and executable("wl-paste")
+  local has_x11 = executable("xclip") or executable("xsel")
+  has_clipboard_provider = has_wayland or has_x11
+end
+
+if has_clipboard_provider then
+  vim.opt.clipboard = "unnamedplus"
+end
 
 vim.opt.scrolloff = 5
 vim.opt.sidescrolloff = 10
@@ -41,7 +58,13 @@ vim.opt.splitright = true
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
-vim.opt.shell = "zsh"
+local shell_candidates = { vim.env.SHELL, "zsh", "bash", "sh" }
+for _, shell in ipairs(shell_candidates) do
+  if executable(shell) then
+    vim.opt.shell = shell
+    break
+  end
+end
 
 if vim.fn.exists("&winborder") == 1 then
   vim.o.winborder = "rounded"

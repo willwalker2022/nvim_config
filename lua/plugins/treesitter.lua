@@ -6,8 +6,10 @@ return {
     opts = {
       auto_install = true,
       ensure_installed = {
+        "bash",
         "c",
         "cpp",
+        "cuda",
         "rust",
         "go",
         "gomod",
@@ -26,6 +28,9 @@ return {
         "elixir",
         "heex",
         "javascript",
+        "lua",
+        "python",
+        "dockerfile",
       },
       sync_install = false,
       highlight = { enable = true },

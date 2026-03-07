@@ -34,7 +34,96 @@ local function enable_lsp(server, opts)
   })
 end
 
-enable_lsp("basedpyright")
+local function resolve_pyright_cmd(cwd)
+  local project_server = cwd .. "/.venv/bin/pyright-langserver"
+  if vim.fn.executable(project_server) == 1 then
+    return { project_server, "--stdio" }
+  end
+
+  local from_path = vim.fn.exepath("pyright-langserver")
+  if type(from_path) == "string" and from_path ~= "" then
+    return { from_path, "--stdio" }
+  end
+
+  local mason_server = vim.fn.stdpath("data") .. "/mason/bin/pyright-langserver"
+  if vim.fn.executable(mason_server) == 1 then
+    return { mason_server, "--stdio" }
+  end
+
+  return { "pyright-langserver", "--stdio" }
+end
+
+local function python_lsp_opts()
+  local analysis = {
+    autoSearchPaths = true,
+    useLibraryCodeForTypes = true,
+    diagnosticMode = "openFilesOnly",
+    typeCheckingMode = "basic",
+  }
+
+  local opts = {
+    settings = {
+      python = {
+        analysis = analysis,
+      },
+      pyright = {
+        analysis = analysis,
+      },
+    },
+  }
+
+  local function append_path(paths, value)
+    if type(value) ~= "string" or value == "" then
+      return
+    end
+    for _, existing in ipairs(paths) do
+      if existing == value then
+        return
+      end
+    end
+    table.insert(paths, value)
+  end
+
+  local cwd = vim.fn.getcwd()
+  opts.cmd = resolve_pyright_cmd(cwd)
+  local extra_paths = {}
+  append_path(extra_paths, cwd)
+
+  local sample_torch = cwd .. "/samples/torch"
+  if vim.fn.isdirectory(sample_torch) == 1 then
+    append_path(extra_paths, sample_torch)
+  end
+
+  local project_venv = cwd .. "/.venv"
+  local project_python = project_venv .. "/bin/python"
+  if vim.fn.executable(project_python) == 1 then
+    opts.settings.python.pythonPath = project_python
+    opts.settings.python.venvPath = cwd
+    opts.settings.python.venv = ".venv"
+  else
+    local conda_prefix = vim.env.CONDA_PREFIX
+    if conda_prefix and conda_prefix ~= "" then
+      local python_path = conda_prefix .. "/bin/python"
+      if vim.fn.executable(python_path) == 1 then
+        local env_name = vim.env.CONDA_DEFAULT_ENV
+        if not env_name or env_name == "" then
+          env_name = vim.fn.fnamemodify(conda_prefix, ":t")
+        end
+        opts.settings.python.pythonPath = python_path
+        opts.settings.python.venvPath = vim.fn.fnamemodify(conda_prefix, ":h")
+        opts.settings.python.venv = env_name
+      end
+    end
+  end
+
+  if #extra_paths > 0 then
+    analysis.extraPaths = extra_paths
+  end
+
+  return opts
+end
+
+enable_lsp("pyright", python_lsp_opts())
 
 local M = {
   {
