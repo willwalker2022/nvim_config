@@ -124,7 +124,6 @@ return {
       { "<leader>si", function() require("snacks").image.hover() end, desc = "[Snacks] Display image" },
       { "<A-i>", function() require("snacks").terminal() end, desc = "[Snacks] Toggle terminal", mode = {"n",  "t"} },
       -- Notification
-      { "<leader>sn", function() require("snacks").picker.notifications() end, desc = "[Snacks] Notification history" },
       { "<leader>n", function() require("snacks").notifier.show_history() end, desc = "[Snacks] Notification history" },
       { "<leader>un", function() require("snacks").notifier.hide() end, desc = "[Snacks] Dismiss all notifications" },
       -- Top Pickers & Explorer
@@ -164,9 +163,9 @@ return {
       { "<leader>sl", function() require("snacks").picker.loclist() end, desc = "[Snacks] Location list" },
       { "<leader>sm", function() require("snacks").picker.marks() end, desc = "[Snacks] Marks" },
       { "<leader>sM", function() require("snacks").picker.man() end, desc = "[Snacks] Man pages" },
-      { "<leader>sp", function() require("snacks").picker.lazy() end, desc = "[Snacks] Search for plugin spec" },
+      { "<leader>sP", function() require("snacks").picker.lazy() end, desc = "[Snacks] Search for plugin spec" },
       { "<leader>sq", function() require("snacks").picker.qflist() end, desc = "[Snacks] Quickfix list" },
-      { "<leader>sr", function() require("snacks").picker.resume() end, desc = "[Snacks] Resume" },
+      { "<leader>sR", function() require("snacks").picker.resume() end, desc = "[Snacks] Resume" },
       { "<leader>su", function() require("snacks").picker.undo() end, desc = "[Snacks] Undo history" },
       -- LSP
       { "gd", function() require("snacks").picker.lsp_definitions() end, desc = "[Snacks] Goto definition" },

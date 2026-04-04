@@ -40,6 +40,8 @@ enable_lsp("yamlls")
 enable_lsp("taplo")
 enable_lsp("marksman")
 
+enable_lsp("vtsls")
+
 return {
   {
     "williamboman/mason.nvim",
@@ -51,6 +53,7 @@ return {
         "yaml-language-server",
         "taplo",
         "marksman",
+        "vtsls",
       },
     },
     opts_extend = { "ensure_installed" },
