@@ -1,37 +1,40 @@
-local function enable_lsp(server, opts)
-  local function setup()
-    if vim.lsp and vim.lsp.config then
-      if vim.lsp.config[server] then
-        if opts then
-          vim.lsp.config(server, opts)
-        end
-        if vim.lsp.enable then
-          vim.lsp.enable(server)
-          return true
-        end
-      end
-      return false
-    end
+local enable_lsp = require("config.lsp_servers").enable
 
-    local ok, lspconfig = pcall(require, "lspconfig")
-    if ok and lspconfig[server] then
-      lspconfig[server].setup(opts or {})
-      return true
+local clangd_root_markers = {
+  ".clangd",
+  ".clang-tidy",
+  ".clang-format",
+  "compile_commands.json",
+  "compile_flags.txt",
+  "configure.ac",
+}
+
+local clangd_fallback_root_markers = {
+  ".git",
+}
+
+local function find_root(path, markers)
+  local match = vim.fs.find(markers, { path = path, upward = true })[1]
+  if match then
+    return vim.fs.dirname(match)
+  end
+end
+
+local function find_clangd_root(path)
+  return find_root(path, clangd_root_markers) or find_root(path, clangd_fallback_root_markers) or path
+end
+
+local function clangd_root_dir()
+  if vim.lsp and vim.lsp.config then
+    return function(bufnr, on_dir)
+      local path = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+      on_dir(find_clangd_root(path))
     end
-    return false
   end
 
-  if setup() then
-    return
+  return function(fname)
+    return find_clangd_root(vim.fs.dirname(fname))
   end
-
-  vim.api.nvim_create_autocmd("User", {
-    pattern = "VeryLazy",
-    once = true,
-    callback = function()
-      setup()
-    end,
-  })
 end
 
 enable_lsp("clangd", {
@@ -40,6 +43,7 @@ enable_lsp("clangd", {
     "--enable-config",
     "--query-driver=/opt/homebrew/bin/riscv64-unknown-elf-*",
   },
+  root_dir = clangd_root_dir(),
 })
 
 return {
