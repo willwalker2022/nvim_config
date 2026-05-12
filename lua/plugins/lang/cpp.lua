@@ -62,6 +62,7 @@ return {
     opts = {
       ensure_installed = {
         "clangd",
+        "codelldb",
       },
     },
     opts_extend = { "ensure_installed" },

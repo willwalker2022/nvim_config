@@ -260,6 +260,16 @@ return {
         border = "rounded",
       },
       on_attach = function(bufnr)
+        local buftype = vim.bo[bufnr].buftype
+        local filetype = vim.bo[bufnr].filetype
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        if buftype == "terminal" or buftype == "nofile" or buftype == "prompt" then
+          return false
+        end
+        if filetype:match("^dap%-") or name:match("%[dap%-") then
+          return false
+        end
+
         local gitsigns = require("gitsigns")
 
         local function map(mode, l, r, opts)
