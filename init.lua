@@ -6,7 +6,7 @@ vim.opt.number = true
 vim.wo.cursorline = true
 -- Display tabs and trailing spaces
 vim.opt.list = true
-vim.opt.listchars = { trail = "-" }
+vim.opt.listchars = { tab = "  ", trail = "-" }
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
