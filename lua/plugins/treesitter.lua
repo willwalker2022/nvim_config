@@ -1,44 +1,40 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "master",
+    branch = "main",
     build = ":TSUpdate",
-    opts = {
-      auto_install = true,
-      ensure_installed = {
+    lazy = false,
+    config = function()
+      require("nvim-treesitter").setup()
+      require("nvim-treesitter").install({
         "c",
         "cpp",
-        "rust",
         "go",
         "gomod",
         "gosum",
         "gotmpl",
         "html",
-        "markdown",
-        "markdown_inline",
         "json",
-        "jsonc",
         "yaml",
         "toml",
+        "lua",
+        "markdown",
+        "markdown_inline",
+        "python",
+        "query",
+        "rust",
         "vim",
         "vimdoc",
-        "query",
-        "elixir",
-        "heex",
         "javascript",
-      },
-      sync_install = false,
-      highlight = { enable = true },
-      indent = { enable = true },
-    },
-    config = function(_, opts)
-      local ok, configs = pcall(require, "nvim-treesitter.configs")
-      if not ok then
-        vim.notify("nvim-treesitter.configs not found. Run :Lazy sync to install the legacy branch.", vim.log.levels.WARN)
-        return
-      end
-      configs.setup(opts)
+      })
+
+      -- Neovim 0.12 built-in ftplugins do not auto-start treesitter.
+      -- nvim-treesitter main branch also requires explicit enabling.
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(args)
+          pcall(vim.treesitter.start, args.buf)
+        end,
+      })
     end,
-    opts_extend = { "ensure_installed" },
   },
 }
