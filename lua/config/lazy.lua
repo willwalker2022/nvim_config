@@ -27,6 +27,7 @@ require("lazy").setup({
   install = { colorscheme = { "habamax" } },
   -- automatically check for plugin updates
   checker = { enabled = false },
+  rocks = { enabled = false },
   ui = {
     -- The border to use for the UI window. Accepts same border values as |nvim_open_win()|.
     border = "rounded",

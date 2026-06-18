@@ -3,6 +3,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     branch = "master",
     build = ":TSUpdate",
+    lazy = false,
     opts = {
       auto_install = true,
       ensure_installed = {
@@ -31,6 +32,7 @@ return {
         "lua",
         "python",
         "dockerfile",
+        "cmake",
       },
       sync_install = false,
       highlight = { enable = true },

@@ -6,3 +6,4 @@ WRN 2026-03-02T15:18:20.764 ?.442664   server_start:199: Failed to start server:
 WRN 2026-03-02T15:18:27.819 ?.442858   server_start:199: Failed to start server: operation not permitted: /run/user/1005/nvim.442858.0
 WRN 2026-03-02T15:18:52.800 ?.443496   server_start:199: Failed to start server: operation not permitted: /run/user/1005/nvim.443496.0
 WRN 2026-03-02T15:19:00.194 ?.443663   server_start:199: Failed to start server: operation not permitted: /run/user/1005/nvim.443663.0
+WRN 2026-06-19T01:39:32.647 ?.2        server_start:199: Failed to start server: operation not permitted: /run/user/1010/nvim.2.0

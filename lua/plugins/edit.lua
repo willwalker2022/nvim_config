@@ -125,6 +125,17 @@ return {
       "folke/snacks.nvim",
     },
     event = "VeryLazy",
+    opts = {
+      keywords = {
+        FIX = { icon = " ", color = "error" },
+        TODO = { icon = " ", color = "info" },
+        HACK = { icon = " ", color = "warning" },
+        WARN = { icon = " ", color = "warning" },
+        PERF = { icon = " ", color = "default" },
+        NOTE = { icon = " ", color = "hint" },
+        TEST = { icon = " ", color = "test" },
+      },
+    },
     -- stylua: ignore
     keys = {
       ---@diagnostic disable-next-line: undefined-field

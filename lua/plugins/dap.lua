@@ -27,7 +27,8 @@ return {
         size = 0.25,
         position = "below",
         terminal = {
-          size = 0.1,
+          -- When the DAP view opens below, keep the views/output split near 60/40.
+          size = 0.4,
           position = "right",
           -- List of debug adapters for which the terminal should be ALWAYS hidden
           hide = {},
@@ -107,6 +108,66 @@ return {
           break
         end
       end
+
+      local debugserver = "/Library/Developer/CommandLineTools/Library/PrivateFrameworks/LLDB.framework/Versions/A/Resources/debugserver"
+      if vim.fn.executable(debugserver) == 1 then
+        vim.fn.setenv("LLDB_DEBUGSERVER_PATH", debugserver)
+      end
+
+      local codelldb = vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/adapter/codelldb"
+      dap.adapters.codelldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = codelldb,
+          args = { "--port", "${port}" },
+        },
+      }
+
+      local function split_args(input)
+        if input == nil or input == "" then
+          return {}
+        end
+        return vim.split(input, " ", { trimempty = true })
+      end
+
+      dap.set_log_level("TRACE")
+
+      dap.configurations.cpp = {
+        {
+          name = "parallel_grep: thread",
+          type = "codelldb",
+          request = "launch",
+          program = "${workspaceFolder}/build/parallel_grep",
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+          args = { "thread" },
+        },
+        {
+          name = "thread_pool_demo",
+          type = "codelldb",
+          request = "launch",
+          program = "${workspaceFolder}/build/thread_pool_demo",
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+          args = {},
+        },
+        {
+          name = "Launch executable",
+          type = "codelldb",
+          request = "launch",
+          program = function()
+            return vim.fn.input("Executable: ", vim.fn.getcwd() .. "/build/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+          args = function()
+            return split_args(vim.fn.input("Args: "))
+          end,
+        },
+      }
+      dap.configurations.c = dap.configurations.cpp
+      dap.configurations.rust = dap.configurations.cpp
     end,
   },
 }

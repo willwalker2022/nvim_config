@@ -7,6 +7,11 @@ return {
     opts_extend = { "ensure_installed" },
     config = function(_, opts)
       require("mason").setup(opts)
+
+      if #vim.api.nvim_list_uis() == 0 then
+        return
+      end
+
       local mr = require("mason-registry")
 
       local function ensure_installed()
@@ -80,6 +85,8 @@ return {
     event = "BufWritePre",
     opts = {
       formatters_by_ft = {
+        javascript = { "clang-format" },
+        glsl = { "clang-format" },
         -- Use the "_" filetype to run formatters on filetypes that don't have other formatters configured.
         ["_"] = { "trim_whitespace" },
       },
@@ -123,16 +130,22 @@ return {
       },
     },
     event = "BufWritePost",
-    config = function()
+    opts = {
+      linters_by_ft = {},
+    },
+    config = function(_, opts)
+      local lint = require("lint")
+      lint.linters_by_ft = vim.tbl_deep_extend("force", lint.linters_by_ft, opts.linters_by_ft or {})
+
       vim.api.nvim_create_autocmd({ "BufWritePost" }, {
         callback = function()
           -- try_lint without arguments runs the linters defined in `linters_by_ft`
           -- for the current filetype
-          require("lint").try_lint()
+          lint.try_lint()
 
           -- You can call `try_lint` with a linter name or a list of names to always
           -- run specific linters, independent of the `linters_by_ft` configuration
-          require("lint").try_lint("codespell")
+          lint.try_lint("codespell")
         end,
       })
     end,

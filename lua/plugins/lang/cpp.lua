@@ -1,10 +1,31 @@
-local function with_blink_capabilities(opts)
-  opts = opts or {}
-  local ok, blink = pcall(require, "blink.cmp")
-  if ok then
-    opts.capabilities = blink.get_lsp_capabilities(opts.capabilities)
+local enable_lsp = require("config.lsp_servers").enable
+
+local clangd_filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" }
+
+local clangd_root_markers = {
+  ".clangd",
+  ".clang-tidy",
+  ".clang-format",
+  "compile_commands.json",
+  "compile_flags.txt",
+  "CMakeLists.txt",
+  "Makefile",
+  "configure.ac",
+}
+
+local clangd_fallback_root_markers = {
+  ".git",
+}
+
+local function find_root(path, markers)
+  local match = vim.fs.find(markers, { path = path, upward = true })[1]
+  if match then
+    return vim.fs.dirname(match)
   end
-  return opts
+end
+
+local function find_clangd_root(path)
+  return find_root(path, clangd_root_markers) or find_root(path, clangd_fallback_root_markers) or path
 end
 
 local function find_compile_commands_dir(root)
@@ -25,8 +46,6 @@ local function find_compile_commands_dir(root)
       return dir
     end
   end
-
-  return nil
 end
 
 local function resolve_clangd_binary()
@@ -48,6 +67,10 @@ local function make_clangd_cmd(root)
     "--pch-storage=memory",
   }
 
+  if vim.fn.has("mac") == 1 then
+    table.insert(cmd, "--query-driver=/opt/homebrew/bin/riscv64-unknown-elf-*")
+  end
+
   local cc_dir = find_compile_commands_dir(root)
   if cc_dir then
     table.insert(cmd, "--compile-commands-dir=" .. cc_dir)
@@ -56,20 +79,20 @@ local function make_clangd_cmd(root)
   return cmd
 end
 
-local function clangd_root_dir(fname)
-  local ok, util = pcall(require, "lspconfig.util")
-  if ok then
-    local root = util.root_pattern("compile_commands.json", ".clangd", ".clang-tidy", "CMakeLists.txt", "Makefile", ".git")(fname)
-    if root then
-      return root
+local function clangd_root_dir()
+  if vim.lsp and vim.lsp.config then
+    return function(bufnr, on_dir)
+      local name = vim.api.nvim_buf_get_name(bufnr)
+      local path = name ~= "" and vim.fs.dirname(name) or vim.fn.getcwd()
+      on_dir(find_clangd_root(path))
     end
-    return util.path.dirname(fname)
   end
 
-  return vim.fn.getcwd()
+  return function(fname)
+    local path = fname ~= "" and vim.fs.dirname(fname) or vim.fn.getcwd()
+    return find_clangd_root(path)
+  end
 end
-
-local clangd_filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" }
 
 local clangd_init_options = {
   clangdFileStatus = true,
@@ -78,75 +101,11 @@ local clangd_init_options = {
   fallbackFlags = { "-std=gnu++20" },
 }
 
-local function enable_lsp(server, opts)
-  local function setup()
-    local server_opts = with_blink_capabilities(opts)
-
-    if vim.lsp and vim.lsp.config and vim.lsp.enable then
-      vim.lsp.config(server, server_opts)
-      vim.lsp.enable(server)
-      return true
-    end
-
-    local ok, lspconfig = pcall(require, "lspconfig")
-    if ok and lspconfig[server] then
-      lspconfig[server].setup(server_opts)
-      return true
-    end
-    return false
-  end
-
-  if setup() then
-    return
-  end
-
-  vim.api.nvim_create_autocmd("User", {
-    pattern = "VeryLazy",
-    once = true,
-    callback = function()
-      setup()
-    end,
-  })
-end
-
 enable_lsp("clangd", {
   cmd = make_clangd_cmd(vim.fn.getcwd()),
-  root_dir = clangd_root_dir,
-  on_new_config = function(new_config, new_root_dir)
-    new_config.cmd = make_clangd_cmd(new_root_dir)
-  end,
+  root_dir = clangd_root_dir(),
   filetypes = clangd_filetypes,
   init_options = clangd_init_options,
-})
-
--- Fallback attach path: in case auto-enable misses a buffer, force-start clangd.
-local clangd_attach_group = vim.api.nvim_create_augroup("UserEnsureClangd", { clear = true })
-vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
-  group = clangd_attach_group,
-  pattern = clangd_filetypes,
-  callback = function(args)
-    local bufnr = args.buf
-    if not (vim.lsp and vim.lsp.start) then
-      return
-    end
-    if #vim.lsp.get_clients({ bufnr = bufnr, name = "clangd" }) > 0 then
-      return
-    end
-
-    local fname = vim.api.nvim_buf_get_name(bufnr)
-    if fname == "" then
-      return
-    end
-
-    local root = clangd_root_dir(fname)
-    local opts = with_blink_capabilities({
-      name = "clangd",
-      cmd = make_clangd_cmd(root),
-      root_dir = root,
-      init_options = clangd_init_options,
-    })
-    vim.lsp.start(opts, { bufnr = bufnr })
-  end,
 })
 
 return {
@@ -166,6 +125,7 @@ return {
       ensure_installed = {
         "clangd",
         "clang-format",
+        "codelldb",
       },
     },
     opts_extend = { "ensure_installed" },
