@@ -135,9 +135,7 @@ return {
       auto_hide = 1,
 
       -- Set the filetypes which barbar will offset itself for
-      sidebar_filetypes = {
-        NvimTree = true, -- Use the default values: {event = 'BufWinLeave', text = '', align = 'left'}
-      },
+      sidebar_filetypes = {},
     },
   },
 
@@ -585,6 +583,7 @@ return {
   {
     "mikavilpas/yazi.nvim",
     dependencies = { "folke/snacks.nvim" },
+    lazy = false,
     -- stylua: ignore
     keys = {
       { "<leader>E",  "<CMD>Yazi<CR>",        desc = "[Yazi] open at the current file", mode = { "n", "v" } },
@@ -592,7 +591,7 @@ return {
       { "<c-up>",     "<CMD>Yazi toggle<CR>", desc = "[Yazi] Resume the last session"                       },
     },
     opts = {
-      open_for_directories = false,
+      open_for_directories = true,
       keymaps = {
         show_help = "<f1>",
       },

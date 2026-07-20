@@ -30,7 +30,10 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     branch = "main",
-    build = ":TSUpdate",
+    build = function()
+      require("nvim-treesitter").install(ensure_installed):wait(300000)
+      vim.cmd.TSUpdate()
+    end,
     lazy = false,
     config = function()
       local ok, treesitter = pcall(require, "nvim-treesitter")
@@ -40,8 +43,6 @@ return {
       end
 
       treesitter.setup()
-      treesitter.install(ensure_installed)
-
       -- Neovim 0.12 built-in ftplugins do not auto-start treesitter.
       -- nvim-treesitter main branch also requires explicit enabling.
       vim.api.nvim_create_autocmd("FileType", {
