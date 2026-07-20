@@ -1,7 +1,6 @@
 local enable_lsp = require("config.lsp_servers").enable
 
 local clangd_filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" }
-
 local clangd_root_markers = {
   ".clangd",
   ".clang-tidy",
@@ -59,6 +58,7 @@ end
 local function make_clangd_cmd(root)
   local cmd = {
     resolve_clangd_binary(),
+    "--enable-config",
     "--background-index",
     "--header-insertion=never",
     "--completion-style=detailed",

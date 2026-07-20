@@ -1,5 +1,4 @@
 local enable_lsp = require("config.lsp_servers").enable
-
 local function resolve_pyright_cmd(cwd)
   local project_server = cwd .. "/.venv/bin/pyright-langserver"
   if vim.fn.executable(project_server) == 1 then
