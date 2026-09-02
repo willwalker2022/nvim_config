@@ -39,7 +39,12 @@ end
 
 enable_lsp("clangd", {
   cmd = {
+    "/bin/zsh",
+    "-c",
+    'ulimit -n 65536; exec "$@"',
+    "clangd-wrapper",
     "clangd",
+    "--log=error",
     "--enable-config",
     "--query-driver=/opt/homebrew/bin/riscv64-unknown-elf-*",
   },

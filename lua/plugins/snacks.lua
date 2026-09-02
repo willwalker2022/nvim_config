@@ -9,7 +9,13 @@ return {
       -- your configuration comes here
       -- or leave it empty to use the default settings
       -- refer to the configuration section below
-      bigfile = { enabled = true },
+      -- Generated/amalgamated headers around 1 MiB can make Treesitter, LSP,
+      -- and folding noticeably sluggish. Use Snacks' lightweight filetype
+      -- before those features attach.
+      bigfile = {
+        enabled = true,
+        size = 800 * 1024,
+      },
       dashboard = { enabled = true },
       explorer = { enabled = false },
       image = {
@@ -131,7 +137,7 @@ return {
       { "<leader>,", function() require("snacks").picker.buffers() end, desc = "[Snacks] Buffers" },
       { "<leader>sn", function() require("snacks").picker.notifications() end, desc = "[Snacks] Notification history" },
       -- find
-      { "<leader>sb", function() require("snacks").picker.buffers() end, desc = "[Snacks] Buffers" },
+      { "<leader>sb", function() require("snacks").picker.lines() end, desc = "[Snacks] Buffer lines" },
       { "<leader>sf", function() require("snacks").picker.files() end, desc = "[Snacks] Find files" },
       { "<leader>sp", function() require("snacks").picker.projects() end, desc = "[Snacks] Projects" },
       { "<leader>sr", function() require("snacks").picker.recent() end, desc = "[Snacks] Recent" },
@@ -142,7 +148,6 @@ return {
       { "<leader>ggb", function() require("snacks").git.blame_line() end, desc = "[Snacks] Git blame line" },
       { "<leader>ggB", function() require("snacks").gitbrowse() end, desc = "[Snacks] Git browse" },
       -- Grep
-      -- { "<leader>sb", function() require("snacks").picker.lines() end, desc = "[Snacks] Buffer lines" },
       -- { "<leader>sB", function() require("snacks").picker.grep_buffers() end, desc = "[Snacks] Grep open buffers" },
       { "<leader>sg", function() require("snacks").picker.grep() end, desc = "[Snacks] Grep" },
       -- { "<leader>sw", function() require("snacks").picker.grep_word() end, desc = "[Snacks] Visual selection or word", mode = { "n", "x" } },
@@ -168,12 +173,21 @@ return {
       { "<leader>sR", function() require("snacks").picker.resume() end, desc = "[Snacks] Resume" },
       { "<leader>su", function() require("snacks").picker.undo() end, desc = "[Snacks] Undo history" },
       -- LSP
-      { "gd", function() require("snacks").picker.lsp_definitions() end, desc = "[Snacks] Goto definition" },
+      { "gd", function() require("snacks").picker.lsp_definitions({ unique_lines = true }) end, desc = "[Snacks] Goto definition" },
       { "gD", function() require("snacks").picker.lsp_declarations() end, desc = "[Snacks] Goto declaration" },
       { "gr", function() require("snacks").picker.lsp_references() end, desc = "[Snacks] References" },
       { "gI", function() require("snacks").picker.lsp_implementations() end, desc = "[Snacks] Goto implementation" },
       { "gy", function() require("snacks").picker.lsp_type_definitions() end, desc = "[Snacks] Goto t[y]pe definition" },
-      { "<leader>ss", function() require("snacks").picker.lsp_symbols() end, desc = "[Snacks] LSP symbols" },
+      {
+        "<leader>ss",
+        function()
+          require("snacks").picker.lsp_symbols({
+            layout = { preset = "telescope", reverse = true },
+            icons = { tree = { last = "┌╴" } },
+          })
+        end,
+        desc = "[Snacks] LSP symbols",
+      },
       { "<leader>sS", function() require("snacks").picker.lsp_workspace_symbols() end, desc = "[Snacks] LSP workspace symbols" },
       -- Words
       { "]]", function() require("snacks").words.jump(vim.v.count1) end, desc = "[Snacks] Next Reference", mode = { "n", "t" } },
@@ -185,6 +199,7 @@ return {
 
     init = function()
       local Snacks = require("snacks")
+
       vim.api.nvim_create_autocmd("User", {
         pattern = "VeryLazy",
         callback = function()
@@ -239,7 +254,9 @@ return {
             .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
             :map("<leader>tc")
           Snacks.toggle.treesitter():map("<leader>tT")
-          Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>tb")
+          Snacks.toggle
+            .option("background", { off = "light", on = "dark", name = "Neovim Dark Palette" })
+            :map("<leader>tb")
           Snacks.toggle.inlay_hints():map("<leader>th")
           Snacks.toggle.indent():map("<leader>tg")
           Snacks.toggle.dim():map("<leader>tD")
@@ -252,8 +269,6 @@ return {
           vim.keymap.del("n", "gra")
           vim.keymap.del("n", "grr")
           vim.keymap.del("n", "gri")
-
-          vim.api.nvim_set_hl(0, "SnacksPickerListCursorLine", { bg = "#313244" })
         end,
       })
     end,

@@ -1,3 +1,33 @@
+local function toggle_nvim_tree_preserving_terminal_widths()
+  local terminal_widths = {}
+
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local config = vim.api.nvim_win_get_config(win)
+    if config.relative == "" and vim.bo[buf].buftype == "terminal" then
+      terminal_widths[win] = vim.api.nvim_win_get_width(win)
+    end
+  end
+
+  require("nvim-tree.api").tree.toggle()
+
+  -- Opening or closing a vertical sidebar can donate one separator column to a
+  -- fixed window. Restore the exact terminal widths after NvimTree has settled.
+  vim.schedule(function()
+    for win, width in pairs(terminal_widths) do
+      if vim.api.nvim_win_is_valid(win) then
+        pcall(vim.api.nvim_win_set_width, win, width)
+        vim.wo[win].winfixwidth = true
+      end
+    end
+  end)
+end
+
+local function platform_icon()
+  local uname = (vim.uv or vim.loop).os_uname()
+  return uname.sysname == "Darwin" and "" or ""
+end
+
 return {
   {
     "nvim-tree/nvim-web-devicons",
@@ -13,6 +43,7 @@ return {
         window = {
           winblend = 0,
           border = "rounded",
+          avoid = { "NvimTree" },
         },
       },
     },
@@ -35,7 +66,7 @@ return {
         lualine_b = { "branch", "diff", "diagnostics" },
         lualine_c = { "filename" },
         lualine_x = {},
-        lualine_y = { "encoding", "fileformat", "filetype", "progress" },
+        lualine_y = { "encoding", platform_icon, "filetype", "progress" },
         lualine_z = { "location" },
       },
       -- stylua: ignore
@@ -51,8 +82,6 @@ return {
       },
     },
     config = function(_, opts)
-      local mocha = require("catppuccin.palettes").get_palette("mocha")
-
       local function lsp_status()
         if not vim.lsp then
           return ""
@@ -89,7 +118,10 @@ return {
 
       local macro_recording = {
         show_macro_recording,
-        color = { fg = "#333333", bg = mocha.red },
+        color = function()
+          local colors = require("catppuccin.palettes").get_palette()
+          return { fg = colors.crust, bg = colors.red }
+        end,
         separator = { left = "", right = "" },
         padding = 0,
       }
@@ -148,9 +180,26 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     keys = {
-      { "<leader>e", "<CMD>NvimTreeToggle<CR>", mode = { "n" }, desc = "[NvimTree] Toggle NvimTree" },
+      {
+        "<leader>e",
+        toggle_nvim_tree_preserving_terminal_widths,
+        mode = { "n" },
+        desc = "[NvimTree] Toggle NvimTree",
+      },
     },
-    opts = {},
+    opts = {
+      view = {
+        preserve_window_proportions = true,
+      },
+      renderer = {
+        highlight_git = "name",
+        icons = {
+          show = {
+            git = false,
+          },
+        },
+      },
+    },
     config = function(_, opts)
       local Explorer = require("nvim-tree.explorer")
       function Explorer:destroy()
@@ -390,7 +439,7 @@ return {
       },
       marks = {
         Search = {
-          color = "#CBA6F7",
+          highlight = "ScrollbarSearchIndicator",
         },
         GitAdd = { text = "┃" },
         GitChange = { text = "┃" },
@@ -421,7 +470,6 @@ return {
       -- require('hlslens').setup() is not required
       require("scrollbar.handlers.search").setup(opts)
       vim.api.nvim_set_hl(0, "HlSearchLens", { link = "CurSearch" })
-      vim.api.nvim_set_hl(0, "HlSearchLensNear", { fg = "#CBA6F7" })
     end,
   },
 

@@ -22,6 +22,52 @@ vim.o.signcolumn = "yes:1"
 
 vim.wo.wrap = false
 
+-- Visually wrap prose, but keep source code on a single screen line.
+-- BufWinEnter also handles switching an existing window between buffer types.
+local wrapped_filetypes = {
+  markdown = true,
+}
+
+local function apply_filetype_line_wrap(win, buf)
+  if not (vim.api.nvim_win_is_valid(win) and vim.api.nvim_buf_is_valid(buf)) then
+    return
+  end
+
+  local wrap = wrapped_filetypes[vim.bo[buf].filetype] or false
+  vim.api.nvim_set_option_value("wrap", wrap, { win = win })
+  vim.api.nvim_set_option_value("linebreak", wrap, { win = win })
+  vim.api.nvim_set_option_value("breakindent", wrap, { win = win })
+end
+
+local function apply_buffer_line_wrap(buf)
+  for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+    apply_filetype_line_wrap(win, buf)
+  end
+end
+
+local line_wrap_group = vim.api.nvim_create_augroup("UserFiletypeLineWrap", { clear = true })
+
+vim.api.nvim_create_autocmd({ "FileType", "BufWinEnter", "WinEnter" }, {
+  group = line_wrap_group,
+  callback = function(args)
+    apply_buffer_line_wrap(args.buf)
+  end,
+})
+
+vim.api.nvim_create_autocmd("SessionLoadPost", {
+  group = line_wrap_group,
+  callback = function()
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      apply_filetype_line_wrap(win, vim.api.nvim_win_get_buf(win))
+    end
+  end,
+})
+
+-- Also make `:source $MYVIMRC` update windows that are already open.
+for _, win in ipairs(vim.api.nvim_list_wins()) do
+  apply_filetype_line_wrap(win, vim.api.nvim_win_get_buf(win))
+end
+
 -- Enables project-local `.nvim.lua` configuration file
 vim.o.exrc = true
 
@@ -34,6 +80,17 @@ vim.opt.smartindent = true
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
+
+-- Keep manually resized terminal splits stable when sidebars open or close.
+vim.api.nvim_create_autocmd("TermOpen", {
+  group = vim.api.nvim_create_augroup("UserTerminalWindow", { clear = true }),
+  callback = function(args)
+    local win = vim.api.nvim_get_current_win()
+    if vim.api.nvim_win_get_buf(win) == args.buf then
+      vim.wo[win].winfixwidth = true
+    end
+  end,
+})
 
 -- Make sure to setup `mapleader` and `maplocalleader` before
 -- loading lazy.nvim so that mappings are correct.

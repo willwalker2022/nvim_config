@@ -1,0 +1,159 @@
+# key	mode	section	description	tags
+i	N	Basics	Enter Insert mode	insert edit core
+jk	I	Basics	Leave Insert mode and return to Normal mode	Esc escape normal core
+:w	N	Basics	Save the current file	write save core
+qq	N/V	Basics	Close the current window	quit close window core
+Q	N/V	Basics	Quit all windows	quit all qa
+u	N	Basics	Undo the last change	undo core
+<C-r>	N	Basics	Redo the last undone change	redo
+.	N	Basics	Repeat the last change	repeat change
+v	N	Basics	Enter characterwise Visual mode	visual select
+V	N	Basics	Enter linewise Visual mode	visual line select
+<C-v>	N	Basics	Enter blockwise Visual mode	visual block column
+<Esc>	N/V	Basics	Cancel the current action or leave Visual mode	cancel escape
+<S-H>	N/V/O	Motion	Move to the first non-blank character	line start beginning ^ core
+<S-L>	N/V/O	Motion	Move to the end of the line	line end $ core
+w / b	N/V/O	Motion	Move forward or backward by one word	word next previous
+e	N/V/O	Motion	Move to the end of the word	word end
+gg / G	N/V/O	Motion	Move to the start or end of the file	file top bottom start end
+{ / }	N/V/O	Motion	Move to the previous or next paragraph	paragraph block
+%	N/V/O	Motion	Jump to the matching bracket	bracket pair matching
+<C-o>	N	Motion	Go back in the jump list	jump back history core
+<C-i>	N	Motion	Go forward in the jump list	jump forward history
+ma	N	Motion	Set mark a at the current position	mark bookmark
+'a	N	Motion	Jump to the line containing mark a	mark bookmark jump
+``	N	Motion	Return to the previous jump position	jump back position
+zz	N	Motion	Center the current line on screen	center scroll
+<leader>f	N/V/O	Motion	Flash jump to a visible location	flash jump label core
+<leader>j / <leader>k	N/V/O	Motion	Flash jump by line	flash line jump
+<C-h/j/k/l>	N	Windows	Focus the left/down/up/right split	window split focus navigation core
+<C-w>v	N	Windows	Create a vertical split	vsplit vertical split
+<C-w>s	N	Windows	Create a horizontal split	split horizontal
+<C-w>q	N	Windows	Close the current split	window close quit
+<C-w>o	N	Windows	Keep only the current split	window only close others
+<C-w>=	N	Windows	Equalize split widths and heights	window equal resize
+<C-w>10<	N	Windows	Shrink the current window by 10 columns	window resize width smaller terminal
+<C-w>10>	N	Windows	Grow the current window by 10 columns	window resize width larger terminal
+:vsplit | terminal	N	Terminal	Open a terminal in a vertical split	terminal shell vertical vsplit core
+<C-\\><C-n>	T	Terminal	Leave Terminal mode for Normal mode	terminal normal escape core
+i	N	Terminal	Return to input mode inside a terminal	terminal insert
+<A-i>	N/T	Terminal	Toggle the floating terminal	terminal toggle snacks
+<leader>e	N	Files	Toggle the NvimTree file tree	tree explorer directory core
+<leader>E	N/V	Files	Open Yazi at the current file	yazi explorer directory core
+<leader>cw	N	Files	Open Yazi in the working directory	yazi cwd working directory
+<C-Up>	N	Files	Resume the previous Yazi session	yazi resume session
+<leader><space>	N	Files	Smart file finder	find file smart picker core
+<leader>sf	N	Files	Find files by name	find files filename picker core
+<leader>sr	N	Files	Find recently opened files	recent file picker
+<leader>sp	N	Files	Find projects	project find picker
+<leader>,	N	Buffers	Find open buffers	buffer list picker core
+<A-h> / <A-l>	N	Buffers	Switch to the previous or next buffer	buffer previous next core
+<A-1>…<A-9>	N	Buffers	Switch to buffer 1 through 9	buffer goto tab
+<A-<> / <A->>	N	Buffers	Move the buffer left or right	buffer move reorder
+<A-w>	N	Buffers	Delete the current buffer	buffer delete close core
+/	N	Search	Search forward in the current file	search find current file core
+?	N	Search	Search backward in the current file	search find backward current file
+n / N	N	Search	Go to the next or previous match	search match next previous core
+* / #	N	Search	Search forward or backward for the word under the cursor	search word cursor next previous
+//	N	Search	Clear search highlighting	search clear highlight noh
+<leader>sg	N	Search	Search text across the project	search grep global project text core
+<leader>sb	N	Search	Search lines in the current buffer	search find buffer lines core
+<leader>s/	N	Search	Search the search history	search history
+<leader>sR	N	Search	Resume the previous picker search	search picker resume
+<leader>sk	N	Search	Search active key mappings	search keymaps shortcut mapping
+<leader>s"	N	Search	Search registers	search registers yank
+<leader>s:	N	Search	Search the command history	search command history
+<leader>sc	N	Search	Search available commands	search commands picker
+<leader>sH	N	Search	Search help pages	search help documentation
+<leader>sM	N	Search	Search manual pages	search man manual
+<leader>st	N	Search	Find TODO, FIX, BUG, and similar comments	search todo fix bug comment
+<leader>sT	N	Search	Find all TODO comments, including NOTE	search todo note comment
+y / yy	N/V	Editing	Yank text or the current line	yank copy clipboard core
+p / P	N	Editing	Paste after or before the cursor	paste put clipboard core
+d / dd	N/V	Editing	Delete text or the current line	delete cut core
+c / cc	N/V	Editing	Change text or the current line	change replace
+x	N	Editing	Delete the character under the cursor	delete character
+r	N	Editing	Replace the character under the cursor	replace character
+o / O	N	Editing	Open a new line below or above	open new line insert
+> / <	N/V	Editing	Increase or decrease indentation	indent shift
+<leader>/	N/V	Editing	Toggle comments	comment toggle core
+sa	N/V	Editing	Add a surrounding pair	mini surround add bracket quote
+sd	N	Editing	Delete a surrounding pair	mini surround delete bracket quote
+sr	N	Editing	Replace a surrounding pair	mini surround replace bracket quote
+mI / mA	V	Editing	Create cursors on selected lines and insert or append	multicursor multiple cursor insert append
+<leader>ut	N	Editing	Toggle the undo tree	undo tree history
+<A-z>	N	Display	Toggle line wrapping	wrap line toggle
+<leader>z	N	Display	Toggle Zen mode	zen focus
+<leader>Z	N	Display	Toggle window zoom	zoom window maximize
+<leader>tl	N	Display	Toggle line numbers	line number toggle
+<leader>tL	N	Display	Toggle relative line numbers	relative line number toggle
+<leader>tw	N	Display	Toggle line wrapping	wrap line toggle
+<leader>tb	N	Display	Toggle Neovim palette between Latte and Mocha	catppuccin neovim theme light dark background
+<leader>ts	N	Display	Toggle spell checking	spell spelling toggle
+<leader>td	N	Display	Toggle diagnostics	diagnostic toggle
+<leader>th	N	Display	Toggle LSP inlay hints	lsp hint toggle
+<leader>tg	N	Display	Toggle indent guides	indent guide toggle
+<leader>to	N	Display	Toggle the inline Git diff overlay	git diff overlay toggle
+K	N	Code	Show hover documentation, or preview a folded line	lsp hover documentation fold core
+gd	N	Code	Go to definition	lsp definition goto jump core
+gD	N	Code	Go to declaration	lsp declaration goto jump
+gr	N	Code	Find references	lsp references usage core
+gI	N	Code	Go to implementation	lsp implementation goto jump
+gy	N	Code	Go to type definition	lsp type definition goto jump
+<leader>ss	N	Code	Search LSP symbols in the current file	lsp symbol structure outline core
+<leader>sS	N	Code	Search LSP symbols in the workspace	lsp workspace symbol structure
+<leader>d	N	Code	Show details for the current diagnostic	lsp diagnostic error float core
+<A-j> / <A-k>	N	Code	Go to the next or previous diagnostic	lsp diagnostic next previous error
+<leader>rn	N	Code	Rename a symbol with LSP	lsp rename refactor
+<leader>gk	N	Code	Show function signature help	lsp signature parameters
+<leader>gd	N	Code	Toggle diagnostics for the current file	trouble diagnostic list
+<leader>gs	N	Code	Toggle the symbol tree	trouble symbols structure outline
+<leader>gl	N	Code	Toggle the definitions and references panel	trouble lsp definition reference
+[[ / ]]	N/T	Code	Go to the previous or next reference	word reference previous next
+zM / zR	N	Folds	Close or open all folds	fold close open all
+zm / zr	N	Folds	Increase or decrease the fold level	fold more less level
+zS	N	Folds	Set the fold level with a count, for example 2zS	fold set level
+<A-j> / <A-k>	I	Completion	Select the next or previous completion item	completion select next previous
+<C-n> / <C-p>	I	Completion	Select the next or previous completion item	completion select next previous
+<Tab> / <CR>	I	Completion	Accept the selected completion item	completion accept enter core
+<S-CR>	I	Completion	Ignore completion and insert a newline	completion newline hide
+<C-u> / <C-d>	I	Completion	Scroll completion documentation up or down	completion documentation scroll
+<A-/>	I/C	Completion	Show or hide the completion menu	completion menu toggle
+<C-g>	N	Git	Toggle LazyGit	git lazygit core
+]h / [h	N	Git	Go to the next or previous hunk	git hunk next previous core
+]H / [H	N	Git	Go to the last or first hunk	git hunk last first
+<leader>ggp	N	Git	Preview the current hunk	git hunk preview
+<leader>ggP	N	Git	Preview the current hunk inline	git hunk preview inline
+<leader>ggs	N/V	Git	Stage the current hunk	git hunk stage
+<leader>ggr	N/V	Git	Reset the current hunk	git hunk reset
+<leader>ggS	N	Git	Stage the entire buffer	git stage buffer
+<leader>ggR	N	Git	Reset the entire buffer	git reset buffer
+<leader>ggl	N	Git	Search the Git log	git log history
+<leader>ggd	N	Git	View the Git diff	git diff
+<leader>ggb	N	Git	Show blame for the current line	git blame line
+<leader>ggB	N	Git	Open the current Git location in a browser	git browse browser
+<leader>tgb	N	Git	Toggle blame for the current line	git blame toggle
+<leader>tgw	N	Git	Toggle word-level diff	git word diff toggle
+<F5>	N	Debugging	Start or continue debugging	debug dap continue core
+<F6>	N	Debugging	Step over	debug dap step over
+<F7>	N	Debugging	Step into	debug dap step into
+<F8>	N	Debugging	Step out	debug dap step out
+<F9>	N	Debugging	Pause debugging	debug dap pause
+<F10>	N	Debugging	Terminate debugging	debug dap terminate stop
+<leader>b	N	Debugging	Toggle a breakpoint	debug dap breakpoint toggle
+<leader>B	N	Debugging	Set a conditional breakpoint	debug dap breakpoint condition
+<leader>Du	N	Debugging	Toggle the debugging interface	debug dap view ui
+<leader>Dr	N	Debugging	Open the debug REPL	debug dap repl
+<leader>Dl	N	Debugging	Run the previous debug configuration again	debug dap run last
+<leader>Dd	N/V	Debugging	Inspect a value in a floating window	debug dap hover value
+<leader>Df	N	Debugging	Show stack frames in a floating window	debug dap frames stack
+<leader>Ds	N	Debugging	Show scoped variables in a floating window	debug dap scopes variables
+<leader>ps	N	Sessions	Restore the session for the current directory	session restore workspace core
+<leader>pS	N	Sessions	Search saved sessions	session search workspace
+<leader>pD	N	Sessions	Delete the current session	session delete workspace
+<leader>n	N	Tools	Show notification history	notification history
+<leader>un	N	Tools	Dismiss all notifications	notification dismiss clear
+<leader>N	N	Tools	Show Noice message history	message noice history
+<leader>?	N	Tools	Show key mappings for the current buffer	which key keymap shortcut help core
+<leader>L	N	Tools	Open the Lazy plugin manager	lazy plugin manager
+<leader>cv	N	Python	Select a Python virtual environment	python virtualenv venv select

@@ -99,7 +99,8 @@ return {
         }
       end
 
-      local debugserver = "/Library/Developer/CommandLineTools/Library/PrivateFrameworks/LLDB.framework/Versions/A/Resources/debugserver"
+      local debugserver =
+        "/Library/Developer/CommandLineTools/Library/PrivateFrameworks/LLDB.framework/Versions/A/Resources/debugserver"
       if vim.fn.executable(debugserver) == 1 then
         vim.fn.setenv("LLDB_DEBUGSERVER_PATH", debugserver)
       end
@@ -121,7 +122,7 @@ return {
         return vim.split(input, " ", { trimempty = true })
       end
 
-      dap.set_log_level("TRACE")
+      dap.set_log_level("WARN")
 
       dap.configurations.cpp = {
         {
