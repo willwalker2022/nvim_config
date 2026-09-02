@@ -98,7 +98,8 @@ vim.api.nvim_create_autocmd("TermOpen", {
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
-vim.opt.shell = "zsh"
+local user_shell = vim.env.SHELL
+vim.opt.shell = user_shell and vim.fn.executable(user_shell) == 1 and user_shell or "sh"
 
 if vim.fn.exists("&winborder") == 1 then
   vim.o.winborder = "rounded"

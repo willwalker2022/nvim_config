@@ -1,5 +1,12 @@
 # nvim.tutorial.config
 
+## Platform branches
+
+- `macos`: the primary macOS configuration.
+- `linux`: the same editor behavior with Linux shell, toolchain, and debugger paths.
+
+The Linux branch expects `clangd`, `clang-format`, and optional cross compilers to be available through `PATH` or standard `/usr/bin` and `/usr/local/bin` locations. Rust projects prefer the `rust-analyzer` provided by `rustup`, with Mason or `PATH` as fallback. C/C++ debugging uses Mason's `codelldb` without Apple's `debugserver`.
+
 本仓库包含了B站[《Neovim从入门到出门》](https://www.bilibili.com/video/BV171LfzDEXU)系列教程的neovim配置
 
 不同章节的内容请查看对应的branch，例如第一节的配置内容在chapter_1分支上

@@ -12,7 +12,7 @@ vim.filetype.add({
 vim.treesitter.language.register("slang", "shaderslang")
 
 enable_lsp("slangd", {
-  cmd = { vim.fn.expand("~/.local/bin/slangd") },
+  cmd = { "slangd" },
   settings = {
     slang = {
       additionalSearchPaths = { "src/gpu" },
@@ -22,7 +22,7 @@ enable_lsp("slangd", {
         parameterNames = true,
       },
       format = {
-        clangFormatLocation = "/opt/homebrew/bin/clang-format",
+        clangFormatLocation = "clang-format",
         clangFormatStyle = "file",
       },
     },
