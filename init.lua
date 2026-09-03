@@ -81,17 +81,6 @@ vim.opt.smartindent = true
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
--- Keep manually resized terminal splits stable when sidebars open or close.
-vim.api.nvim_create_autocmd("TermOpen", {
-  group = vim.api.nvim_create_augroup("UserTerminalWindow", { clear = true }),
-  callback = function(args)
-    local win = vim.api.nvim_get_current_win()
-    if vim.api.nvim_win_get_buf(win) == args.buf then
-      vim.wo[win].winfixwidth = true
-    end
-  end,
-})
-
 -- Make sure to setup `mapleader` and `maplocalleader` before
 -- loading lazy.nvim so that mappings are correct.
 -- This is also a good place to setup other settings (vim.opt)
