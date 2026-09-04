@@ -42,7 +42,7 @@ enable_lsp("clangd", {
     "clangd",
     "--log=error",
     "--enable-config",
-    "--query-driver=/usr/bin/riscv64-unknown-elf-*,/usr/bin/riscv64-linux-gnu-*,/usr/local/bin/riscv64-unknown-elf-*",
+    "--query-driver=/usr/bin/g++,/usr/bin/gcc,/usr/bin/riscv64-unknown-elf-*,/usr/bin/riscv64-linux-gnu-*,/usr/local/bin/riscv64-unknown-elf-*",
   },
   root_dir = clangd_root_dir(),
 })
