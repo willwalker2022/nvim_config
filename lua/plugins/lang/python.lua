@@ -1,13 +1,23 @@
 local enable_lsp = require("config.lsp_servers").enable
 
-enable_lsp("basedpyright")
+enable_lsp("basedpyright", {
+  -- Neovim's recursive macOS watcher can exhaust kqueue resources even in a
+  -- modest Python workspace. Let basedpyright discover changes itself.
+  capabilities = {
+    workspace = {
+      didChangeWatchedFiles = {
+        dynamicRegistration = false,
+      },
+    },
+  },
+})
 
 local M = {
   {
     "williamboman/mason.nvim",
     optional = true,
     opts_extend = { "ensure_installed" },
-    opts = { ensure_installed = { "ruff", "pyright", "basedpyright" } },
+    opts = { ensure_installed = { "ruff", "basedpyright" } },
   },
 
   -- formatter

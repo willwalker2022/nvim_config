@@ -1,3 +1,5 @@
+local enable_lsp = require("config.lsp_servers").enable
+
 vim.filetype.add({
   extension = {
     glsl = "glsl",
@@ -12,21 +14,9 @@ vim.filetype.add({
   },
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("UserGlslLsp", { clear = true }),
-  pattern = { "glsl", "vert", "tesc", "tese", "frag", "geom", "comp" },
-  callback = function(args)
-    if not (vim.lsp and vim.lsp.config and vim.lsp.config.glsl_analyzer) then
-      return
-    end
-
-    local clients = vim.lsp.get_clients({ bufnr = args.buf, name = "glsl_analyzer" })
-    if #clients > 0 then
-      return
-    end
-
-    pcall(vim.lsp.start, vim.lsp.config.glsl_analyzer, { bufnr = args.buf })
-  end,
+enable_lsp("glsl_analyzer", {
+  -- All shader extensions above resolve to the single Neovim filetype `glsl`.
+  filetypes = { "glsl" },
 })
 
 return {
