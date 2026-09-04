@@ -57,6 +57,7 @@ n / N	N	Search	Go to the next or previous match	search match next previous core
 * / #	N	Search	Search forward or backward for the word under the cursor	search word cursor next previous
 //	N	Search	Clear search highlighting	search clear highlight noh
 <leader>sg	N	Search	Search text across the project	search grep global project text core
+<leader>sw	N/V	Search	Search the word or visual selection across the project	search grep word selection project text
 <leader>sb	N	Search	Search lines in the current buffer	search find buffer lines core
 <leader>s/	N	Search	Search the search history	search history
 <leader>sR	N	Search	Resume the previous picker search	search picker resume
@@ -97,14 +98,19 @@ mI / mA	V	Editing	Create cursors on selected lines and insert or append	multicur
 K	N	Code	Show hover documentation, or preview a folded line	lsp hover documentation fold core
 gd	N	Code	Go to definition	lsp definition goto jump core
 gD	N	Code	Go to declaration	lsp declaration goto jump
-gr	N	Code	Find references	lsp references usage core
+gr	N	Code	Find references; fall back to a text search when unsupported	lsp references usage grep fallback core
 gI	N	Code	Go to implementation	lsp implementation goto jump
 gy	N	Code	Go to type definition	lsp type definition goto jump
-<leader>ss	N	Code	Search LSP symbols in the current file	lsp symbol structure outline core
+<leader>ci	N	Code	Find functions that call the symbol under the cursor	lsp call hierarchy incoming caller
+<leader>co	N	Code	Find functions called by the symbol under the cursor	lsp call hierarchy outgoing callee
+<leader>ss	N	Code	Search LSP or Tree-sitter symbols in the current file	lsp treesitter symbol structure outline core
 <leader>sS	N	Code	Search LSP symbols in the workspace	lsp workspace symbol structure
 <leader>d	N	Code	Show details for the current diagnostic	lsp diagnostic error float core
 <A-j> / <A-k>	N	Code	Go to the next or previous diagnostic	lsp diagnostic next previous error
-<leader>rn	N	Code	Rename a symbol with LSP	lsp rename refactor
+<leader>ca	N/V	Code	Show code actions for the cursor or selection	lsp code action fix refactor
+<leader>cr	N	Code	Rename a symbol with LSP	lsp rename refactor
+<leader>cc	N	Code	Run the CodeLens action on the current line	lsp codelens action
+<leader>ch	N	Code	Switch between a C/C++ source file and its header	clangd c cpp source header switch
 <leader>gk	N	Code	Show function signature help	lsp signature parameters
 <leader>gd	N	Code	Toggle diagnostics for the current file	trouble diagnostic list
 <leader>gs	N	Code	Toggle the symbol tree	trouble symbols structure outline

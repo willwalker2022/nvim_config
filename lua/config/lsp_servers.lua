@@ -1,5 +1,25 @@
 local M = {}
 
+local function find_root(path, markers)
+  local match = vim.fs.find(markers, { path = path, upward = true })[1]
+  return match and vim.fs.dirname(match) or path
+end
+
+function M.root_dir(markers)
+  if vim.lsp and vim.lsp.config then
+    return function(bufnr, on_dir)
+      local name = vim.api.nvim_buf_get_name(bufnr)
+      local path = name ~= "" and vim.fs.dirname(name) or vim.uv.cwd()
+      on_dir(find_root(path, markers))
+    end
+  end
+
+  return function(fname)
+    local path = fname and fname ~= "" and vim.fs.dirname(fname) or vim.uv.cwd()
+    return find_root(path, markers)
+  end
+end
+
 function M.enable(server, opts)
   local function setup()
     if vim.lsp and vim.lsp.config then

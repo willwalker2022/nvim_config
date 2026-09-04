@@ -1,3 +1,61 @@
+local function lsp_supports(method)
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+    if client:supports_method(method, bufnr) then
+      return true
+    end
+  end
+
+  return false
+end
+
+local function notify_unsupported(feature)
+  vim.notify(feature .. " is not supported by the language server for this buffer", vim.log.levels.INFO)
+end
+
+local function lsp_picker(method, picker, opts)
+  return function()
+    if not lsp_supports(method) then
+      notify_unsupported(opts and opts.feature or picker)
+      return
+    end
+
+    require("snacks").picker[picker](opts and opts.picker or nil)
+  end
+end
+
+local function references()
+  if lsp_supports("textDocument/references") then
+    require("snacks").picker.lsp_references()
+    return
+  end
+
+  vim.notify("LSP references are unavailable; searching for this word as text", vim.log.levels.INFO)
+  require("snacks").picker.grep_word()
+end
+
+local function document_symbols()
+  local opts = {
+    layout = { preset = "telescope", reverse = true },
+    icons = { tree = { last = "┌╴" } },
+  }
+
+  if lsp_supports("textDocument/documentSymbol") then
+    require("snacks").picker.lsp_symbols(opts)
+    return
+  end
+
+  local has_parser = pcall(vim.treesitter.get_parser, 0)
+  if has_parser then
+    vim.notify("LSP symbols are unavailable; using Tree-sitter symbols", vim.log.levels.INFO)
+    require("snacks").picker.treesitter(opts)
+    return
+  end
+
+  notify_unsupported("Document symbols")
+end
+
 return {
 
   {
@@ -150,7 +208,7 @@ return {
       -- Grep
       -- { "<leader>sB", function() require("snacks").picker.grep_buffers() end, desc = "[Snacks] Grep open buffers" },
       { "<leader>sg", function() require("snacks").picker.grep() end, desc = "[Snacks] Grep" },
-      -- { "<leader>sw", function() require("snacks").picker.grep_word() end, desc = "[Snacks] Visual selection or word", mode = { "n", "x" } },
+      { "<leader>sw", function() require("snacks").picker.grep_word() end, desc = "[Snacks] Search word or selection", mode = { "n", "x" } },
       -- search
       { '<leader>s"', function() require("snacks").picker.registers() end, desc = "[Snacks] Registers" },
       { '<leader>s/', function() require("snacks").picker.search_history() end, desc = "[Snacks] Search history" },
@@ -173,22 +231,15 @@ return {
       { "<leader>sR", function() require("snacks").picker.resume() end, desc = "[Snacks] Resume" },
       { "<leader>su", function() require("snacks").picker.undo() end, desc = "[Snacks] Undo history" },
       -- LSP
-      { "gd", function() require("snacks").picker.lsp_definitions({ unique_lines = true }) end, desc = "[Snacks] Goto definition" },
-      { "gD", function() require("snacks").picker.lsp_declarations() end, desc = "[Snacks] Goto declaration" },
-      { "gr", function() require("snacks").picker.lsp_references() end, desc = "[Snacks] References" },
-      { "gI", function() require("snacks").picker.lsp_implementations() end, desc = "[Snacks] Goto implementation" },
-      { "gy", function() require("snacks").picker.lsp_type_definitions() end, desc = "[Snacks] Goto t[y]pe definition" },
-      {
-        "<leader>ss",
-        function()
-          require("snacks").picker.lsp_symbols({
-            layout = { preset = "telescope", reverse = true },
-            icons = { tree = { last = "┌╴" } },
-          })
-        end,
-        desc = "[Snacks] LSP symbols",
-      },
-      { "<leader>sS", function() require("snacks").picker.lsp_workspace_symbols() end, desc = "[Snacks] LSP workspace symbols" },
+      { "gd", lsp_picker("textDocument/definition", "lsp_definitions", { feature = "Definition", picker = { unique_lines = true } }), desc = "[Snacks] Goto definition" },
+      { "gD", lsp_picker("textDocument/declaration", "lsp_declarations", { feature = "Declaration" }), desc = "[Snacks] Goto declaration" },
+      { "gr", references, nowait = true, desc = "[Snacks] References" },
+      { "gI", lsp_picker("textDocument/implementation", "lsp_implementations", { feature = "Implementation" }), desc = "[Snacks] Goto implementation" },
+      { "gy", lsp_picker("textDocument/typeDefinition", "lsp_type_definitions", { feature = "Type definition" }), desc = "[Snacks] Goto type definition" },
+      { "<leader>ci", lsp_picker("textDocument/prepareCallHierarchy", "lsp_incoming_calls", { feature = "Incoming calls" }), desc = "[Snacks] Incoming calls" },
+      { "<leader>co", lsp_picker("textDocument/prepareCallHierarchy", "lsp_outgoing_calls", { feature = "Outgoing calls" }), desc = "[Snacks] Outgoing calls" },
+      { "<leader>ss", document_symbols, desc = "[Snacks] Document symbols" },
+      { "<leader>sS", lsp_picker("workspace/symbol", "lsp_workspace_symbols", { feature = "Workspace symbols" }), desc = "[Snacks] Workspace symbols" },
       -- Words
       { "]]", function() require("snacks").words.jump(vim.v.count1) end, desc = "[Snacks] Next Reference", mode = { "n", "t" } },
       { "[[", function() require("snacks").words.jump(-vim.v.count1) end, desc = "[Snacks] Prev Reference", mode = { "n", "t" } },
@@ -265,10 +316,12 @@ return {
           -- Toggle the profiler highlights
           Snacks.toggle.profiler_highlights():map("<leader>tph")
 
-          vim.keymap.del("n", "grn")
-          vim.keymap.del("n", "gra")
-          vim.keymap.del("n", "grr")
-          vim.keymap.del("n", "gri")
+          -- This configuration uses the concise Snacks navigation scheme. Remove
+          -- Neovim's overlapping `gr*` defaults so `gr` is immediate and there is
+          -- only one discoverable key for each operation.
+          for _, lhs in ipairs({ "grn", "gra", "grr", "gri", "grt", "grx" }) do
+            pcall(vim.keymap.del, "n", lhs)
+          end
         end,
       })
     end,

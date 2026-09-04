@@ -1,4 +1,11 @@
-local enable_lsp = require("config.lsp_servers").enable
+local lsp_servers = require("config.lsp_servers")
+local enable_lsp = lsp_servers.enable
+
+local slangd_root_markers = {
+  "slangdconfig.json",
+  ".clang-format",
+  ".git",
+}
 
 vim.filetype.add({
   extension = {
@@ -13,6 +20,8 @@ vim.treesitter.language.register("slang", "shaderslang")
 
 enable_lsp("slangd", {
   cmd = { "slangd" },
+  filetypes = { "shaderslang" },
+  root_dir = lsp_servers.root_dir(slangd_root_markers),
   settings = {
     slang = {
       additionalSearchPaths = { "src/gpu" },

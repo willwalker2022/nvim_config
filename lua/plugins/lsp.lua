@@ -51,23 +51,56 @@ return {
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", {}),
         callback = function(ev)
+          local client = vim.lsp.get_client_by_id(ev.data.client_id)
+
+          -- Neovim installs these defaults when an LSP client attaches. This
+          -- configuration exposes the same operations through the concise
+          -- Snacks mappings instead, so remove the overlapping `gr*` family.
+          for _, lhs in ipairs({ "grn", "gra", "grr", "gri", "grt", "grx" }) do
+            pcall(vim.keymap.del, "n", lhs)
+          end
+
           -- vim.keymap.set("n", "K", vim.lsp.buf.hover) -- configured in "nvim-ufo" plugin
           vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, {
             buffer = ev.buf,
             desc = "[LSP] Show diagnostic",
           })
-          vim.keymap.set("n", "<leader>gk", vim.lsp.buf.signature_help, { desc = "[LSP] Signature help" })
-          vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, { desc = "[LSP] Add workspace folder" })
+          vim.keymap.set("n", "<leader>gk", vim.lsp.buf.signature_help, {
+            buffer = ev.buf,
+            desc = "[LSP] Signature help",
+          })
+          vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, {
+            buffer = ev.buf,
+            desc = "[LSP] Add workspace folder",
+          })
           vim.keymap.set(
             "n",
             "<leader>wr",
             vim.lsp.buf.remove_workspace_folder,
-            { desc = "[LSP] Remove workspace folder" }
+            { buffer = ev.buf, desc = "[LSP] Remove workspace folder" }
           )
           vim.keymap.set("n", "<leader>wl", function()
             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-          end, { desc = "[LSP] List workspace folders" })
-          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = ev.buf, desc = "[LSP] Rename" })
+          end, { buffer = ev.buf, desc = "[LSP] List workspace folders" })
+          vim.keymap.set({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, {
+            buffer = ev.buf,
+            desc = "[LSP] Code action",
+          })
+          vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, {
+            buffer = ev.buf,
+            desc = "[LSP] Rename",
+          })
+          vim.keymap.set("n", "<leader>cc", vim.lsp.codelens.run, {
+            buffer = ev.buf,
+            desc = "[LSP] Run CodeLens",
+          })
+
+          if client and client.name == "clangd" then
+            vim.keymap.set("n", "<leader>ch", "<Cmd>LspClangdSwitchSourceHeader<CR>", {
+              buffer = ev.buf,
+              desc = "[Clangd] Switch source/header",
+            })
+          end
         end,
       })
     end,
@@ -132,6 +165,10 @@ return {
 
       vim.api.nvim_create_autocmd({ "BufWritePost" }, {
         callback = function()
+          if vim.bo.buftype ~= "" or not vim.bo.modifiable or vim.bo.filetype == "bigfile" then
+            return
+          end
+
           -- try_lint without arguments runs the linters defined in `linters_by_ft`
           -- for the current filetype
           lint.try_lint()
